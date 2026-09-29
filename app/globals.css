@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --color-brand-50: oklch(0.95 0.02 270);
+  --color-brand-100: oklch(0.85 0.07 269);
+  --color-brand-200: oklch(0.75 0.12 268);
+  --color-brand-300: oklch(0.66 0.17 267);
+  --color-brand-400: oklch(0.6 0.2 265);
+  --color-brand-500: oklch(0.5 0.26 264);
+  --color-brand-600: oklch(0.44 0.22 264);
+  --color-brand-700: oklch(0.37 0.18 264);
+  --color-brand-800: oklch(0.29 0.14 264);
+  --color-brand-900: oklch(0.22 0.1 264);
+  --color-brand-950: oklch(0.13 0.04 259);
+
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: var(--color-brand-500);
+  --primary-foreground: var(--color-brand-50);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: var(--color-brand-400);
+  --primary-foreground: var(--color-brand-50);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+.code-surface {
+  background: var(--color-brand-950);
+  color: oklch(0.9 0 0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* Chart panel flip animation */
+@keyframes chart-flip-in {
+  0% { opacity: 0; transform: rotateY(90deg) scale(0.95); }
+  100% { opacity: 1; transform: rotateY(0deg) scale(1); }
+}
+
+.chart-panel-animate {
+  animation: chart-flip-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* SQL syntax highlighting */
+.sql-keyword {
+  color: var(--color-brand-400);
+  font-weight: 600;
+}
+
+.sql-string {
+  color: oklch(0.72 0.17 145);
+}
+
+.sql-number {
+  color: oklch(0.75 0.15 65);
+}
+
+.sql-comment {
+  color: oklch(0.55 0 0);
+  font-style: italic;
+}
+
+.sql-function {
+  color: oklch(0.75 0.12 200);
+}

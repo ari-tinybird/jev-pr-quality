@@ -1,0 +1,96 @@
+name: Jev PR Quality
+description: Review a complete pull request diff with Jev and log structured quality events to RawTree.
+branding:
+  icon: activity
+  color: blue
+
+inputs:
+  jev-api-key:
+    description: TypeSafe API key used by Jev.
+    required: true
+  rawtree-api-key:
+    description: Write-only RawTree key. Logging is skipped when omitted.
+    required: false
+  minimum-score:
+    description: Minimum passing score for every applicable dimension.
+    required: false
+    default: "7"
+  rawtree-database:
+    description: RawTree database. Defaults to the API key's database.
+    required: false
+  rawtree-table:
+    description: RawTree event table.
+    required: false
+    default: jev_pr_reviews
+  rawtree-base-url:
+    description: RawTree API endpoint.
+    required: false
+    default: https://api.rawtree.com
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: 24
+
+    - name: Install Jev review dependencies
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+      run: npm ci --ignore-scripts --prefix "$ACTION_PATH/scripts/jev-review"
+
+    - name: Evaluate pull request
+      id: evaluate
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        JEV_API_KEY: ${{ inputs.jev-api-key }}
+        JEV_MIN_SCORE: ${{ inputs.minimum-score }}
+      run: |
+        set +e
+        node "$ACTION_PATH/scripts/jev-review/run.mjs"
+        status=$?
+        echo "status=$status" >> "$GITHUB_OUTPUT"
+        exit 0
+
+    - name: Log ratings to RawTree
+      if: ${{ always() && inputs.rawtree-api-key != '' }}
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        RAWTREE_JEV_API_KEY: ${{ inputs.rawtree-api-key }}
+        RAWTREE_JEV_DATABASE: ${{ inputs.rawtree-database }}
+        RAWTREE_JEV_TABLE: ${{ inputs.rawtree-table }}
+        RAWTREE_JEV_BASE_URL: ${{ inputs.rawtree-base-url }}
+      run: node "$ACTION_PATH/scripts/jev-review/log-rawtree.mjs"
+
+    - name: Publish review comment
+      if: ${{ always() }}
+      uses: actions/github-script@v7
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+      with:
+        script: |
+          const { pathToFileURL } = require('node:url');
+          const script = pathToFileURL(`${process.env.ACTION_PATH}/scripts/jev-review/comment.mjs`);
+          const { run } = await import(script.href);
+          await run({ github, context, core });
+
+    - name: Upload ratings
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: jev-review-${{ github.event.pull_request.head.sha }}
+        path: jev-review.json
+        overwrite: true
+        if-no-files-found: ignore
+        retention-days: 14
+
+    - name: Enforce Jev result
+      if: ${{ always() }}
+      shell: bash
+      env:
+        STATUS: ${{ steps.evaluate.outputs.status }}
+      run: exit "${STATUS:-1}"

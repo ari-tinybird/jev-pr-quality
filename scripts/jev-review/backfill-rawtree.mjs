@@ -71,6 +71,28 @@ function fetchArtifactRuns(artifactPages, repository, cacheDirectory, limit) {
     .filter((artifact) => artifact.name.startsWith('jev-review-') && !artifact.expired)
     .sort((left, right) => right.created_at.localeCompare(left.created_at));
   const runIds = [...new Set(artifacts.map((artifact) => artifact.workflow_run.id))];
+  if (limit === null) {
+    if (runIds.length === 0) return [{ workflow_runs: [] }];
+    const representative = cachedJson(
+      join(cacheDirectory, 'runs', `${runIds[0]}.json`),
+      () => ghJson(['api', `repos/${repository}/actions/runs/${runIds[0]}`]),
+    );
+    const pages = cachedJson(
+      join(cacheDirectory, `workflow-${representative.workflow_id}-runs.json`),
+      () => fetchPages(
+        `repos/${repository}/actions/workflows/${representative.workflow_id}/runs?per_page=100`,
+      ),
+    );
+    const found = new Set(pages.flatMap((page) => page.workflow_runs).map((run) => run.id));
+    const missingRuns = runIds
+      .filter((runId) => !found.has(runId))
+      .map((runId) => cachedJson(
+        join(cacheDirectory, 'runs', `${runId}.json`),
+        () => ghJson(['api', `repos/${repository}/actions/runs/${runId}`]),
+      ));
+    return missingRuns.length ? [...pages, { workflow_runs: missingRuns }] : pages;
+  }
+
   const workflow_runs = [];
   for (const [index, runId] of runIds.entries()) {
     process.stderr.write(`Reading workflow run ${index + 1}/${runIds.length}\r`);
@@ -186,12 +208,21 @@ async function main() {
   const headCache = new Map();
   const branchCache = new Map();
   const events = [];
+  const unidentifiedRuns = [];
 
   for (const [index, { artifact, run }] of candidates.entries()) {
     process.stderr.write(`Preparing ${index + 1}/${candidates.length}: workflow run ${run.id}\r`);
-    const pullRequest = resolvePullRequest(
-      run, repository, cacheDirectory, pullRequestCache, headCache, branchCache,
-    );
+    let pullRequest;
+    try {
+      pullRequest = resolvePullRequest(
+        run, repository, cacheDirectory, pullRequestCache, headCache, branchCache,
+      );
+    } catch (error) {
+      if (!error.message.startsWith('Could not identify the PR for workflow run')) throw error;
+      unidentifiedRuns.push(run.id);
+      process.stderr.write(`\nSkipping workflow run ${run.id}: no matching PR found.\n`);
+      continue;
+    }
     const report = downloadReport(run, artifact, repository, cacheDirectory);
     events.push(buildBackfillReviewEvent({ report, pullRequest, run, artifact, repository }));
   }
@@ -202,6 +233,7 @@ async function main() {
     retained_review_runs: selected.length,
     prepared_events: events.length,
     pull_requests: new Set(events.map((event) => event.pr_number)).size,
+    unidentified_runs: unidentifiedRuns.length,
     earliest_review: events[0]?.recorded_at ?? null,
     latest_review: events.at(-1)?.recorded_at ?? null,
   };

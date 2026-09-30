@@ -29,6 +29,58 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-primary-hover: var(--primary-hover);
+  --color-brand-light: var(--brand-light);
+  --color-brand-dark: var(--brand-dark);
+  --color-surface-01: var(--surface-01);
+  --color-surface-02: var(--surface-02);
+  --color-surface-dark: var(--surface-dark);
+  --color-extra-muted-foreground: var(--extra-muted-foreground);
+  --color-high-contrast-border: var(--high-contrast-border);
+  --color-destructive-hover: var(--destructive-hover);
+  --color-destructive-light: var(--destructive-light);
+  --color-alternative: var(--alternative);
+  --color-alternative-light: var(--alternative-light);
+  --color-preview: var(--preview);
+  --color-success: var(--success);
+  --color-success-light: var(--success-light);
+  --color-warning: var(--warning);
+  --color-warning-light: var(--warning-light);
+  --color-info: var(--info);
+  --color-info-light: var(--info-light);
+  --color-canvas: var(--canvas);
+  --text-display-vast: 4rem;
+  --text-display-vast--line-height: 4.5rem;
+  --text-display-vast--font-weight: 600;
+  --text-display-xl: 2.75rem;
+  --text-display-xl--line-height: 3.75rem;
+  --text-display-xl--font-weight: 400;
+  --text-display-md: 2rem;
+  --text-display-md--line-height: 2.75rem;
+  --text-display-md--font-weight: 600;
+  --text-display-sm: 1.5rem;
+  --text-display-sm--line-height: 2rem;
+  --text-display-sm--font-weight: 600;
+  --text-display-xs: 1.125rem;
+  --text-display-xs--line-height: 1.5rem;
+  --text-display-xs--font-weight: 600;
+  --text-heading: 1.125rem;
+  --text-heading--line-height: 1.5rem;
+  --text-heading--font-weight: 500;
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.25rem;
+  --text-subheading: 0.6875rem;
+  --text-subheading--line-height: 1rem;
+  --text-subheading--font-weight: 500;
+  --text-subheading--letter-spacing: 1px;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+  --text-code: 0.8125rem;
+  --text-code--line-height: 1.3125rem;
+  --text-code-caption: 0.625rem;
+  --text-code-caption--line-height: 1rem;
+  --radius-card: 16px;
+  --radius-panel: 24px;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -51,29 +103,84 @@
   --color-brand-900: oklch(0.22 0.1 264);
   --color-brand-950: oklch(0.13 0.04 259);
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: var(--color-brand-500);
-  --primary-foreground: var(--color-brand-50);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  /* Figma: Rawtree - Components and styles / Colors */
+  --rt-neutral-00: #ffffff;
+  --rt-neutral-04: #f4f5f9;
+  --rt-neutral-12: #e8e9f0;
+  --rt-neutral-24: #c4c6d4;
+  --rt-neutral-40: #9a9db4;
+  --rt-neutral-64: #5c6079;
+  --rt-neutral-100: #1e2140;
+  --rt-brand: #0019ff;
+  --rt-brand-hover: #0012cc;
+  --rt-brand-dark: #000f99;
+  --rt-brand-light: #e5e8ff;
+  --rt-teal: #0d9487;
+  --rt-teal-light: #f0fcfa;
+  --rt-orange: #ff631a;
+  --rt-error: #de1616;
+  --rt-error-hover: #b20d0d;
+  --rt-error-light: #fdecec;
+  --rt-success: #1fa63d;
+  --rt-success-light: #e8faeb;
+  --rt-warning: #856100;
+  --rt-warning-light: #fffbd6;
+  --rt-info: #3366f2;
+  --rt-info-light: #e8edff;
+  --rt-code-01: #0026d9;
+  --rt-code-02: #cc2e2e;
+  --rt-code-03: #00858c;
+  --rt-code-04: #80809e;
+  --rt-code-05: #595c7a;
+  --rt-code-06: #8f21b2;
+  --rt-code-07: #c76100;
+  /* Not a Figma variable: hard-coded page background in the onboarding screens */
+  --rt-canvas: #f7f7f4;
+  --canvas: var(--rt-canvas);
+
+  --background: var(--rt-neutral-00);
+  --foreground: var(--rt-neutral-100);
+  --card: var(--rt-neutral-00);
+  --card-foreground: var(--rt-neutral-100);
+  --popover: var(--rt-neutral-00);
+  --popover-foreground: var(--rt-neutral-100);
+  --primary: var(--rt-brand);
+  --primary-hover: var(--rt-brand-hover);
+  --primary-foreground: var(--rt-neutral-00);
+  --brand-light: var(--rt-brand-light);
+  --brand-dark: var(--rt-brand-dark);
+  --surface-01: var(--rt-neutral-04);
+  --surface-02: var(--rt-neutral-12);
+  --surface-dark: var(--rt-neutral-100);
+  --secondary: var(--rt-neutral-04);
+  --secondary-foreground: var(--rt-neutral-100);
+  --muted: var(--rt-neutral-04);
+  --muted-foreground: var(--rt-neutral-64);
+  --extra-muted-foreground: var(--rt-neutral-40);
+  --accent: var(--rt-neutral-12);
+  --accent-foreground: var(--rt-neutral-100);
+  --destructive: var(--rt-error);
+  --destructive-hover: var(--rt-error-hover);
+  --destructive-light: var(--rt-error-light);
+  --alternative: var(--rt-teal);
+  --alternative-light: var(--rt-teal-light);
+  --preview: var(--rt-orange);
+  --success: var(--rt-success);
+  --success-light: var(--rt-success-light);
+  --warning: var(--rt-warning);
+  --warning-light: var(--rt-warning-light);
+  --info: var(--rt-info);
+  --info-light: var(--rt-info-light);
+  --border: var(--rt-neutral-12);
+  --input: var(--rt-neutral-24);
+  --high-contrast-border: var(--rt-neutral-64);
+  --ring: var(--rt-brand);
+  /* Not in Figma: chart palette picked from brand colors */
+  --chart-1: var(--rt-brand);
+  --chart-2: var(--rt-teal);
+  --chart-3: var(--rt-orange);
+  --chart-4: var(--rt-code-06);
+  --chart-5: var(--rt-success);
   --radius: 0.625rem;
 }
 
@@ -96,11 +203,11 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --chart-1: oklch(0.62 0.2 255);
+  --chart-2: oklch(0.68 0.16 150);
+  --chart-3: oklch(0.7 0.17 40);
+  --chart-4: oklch(0.55 0.2 330);
+  --chart-5: oklch(0.7 0.18 85);
 }
 
 @layer base {
@@ -113,13 +220,53 @@
   html {
     @apply font-sans;
   }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
 }
 
 .code-surface {
+  color: var(--foreground);
+  font-size: 0.8125rem;
+  line-height: 1.3125rem;
+}
+
+.dark .code-surface {
   background: var(--color-brand-950);
   color: oklch(0.9 0 0);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  padding: 0.75rem;
+}
+
+/* Login background lines: animation copied from illustration-lab/cards/index.backup-onda-suave.html */
+.brand-lines svg {
+  opacity: 0.6;
+}
+
+.brand-lines path {
+  stroke: #cccccc;
+  stroke-width: 0.75;
+  animation-name: wave-color, wave-shift;
+  animation-duration: 9s, 7s;
+  animation-timing-function: ease-in-out, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes wave-color {
+  0%   { stroke: #cccccc; filter: drop-shadow(0 0 0px rgba(0, 25, 255, 0)); }
+  42%  { stroke: #cccccc; filter: drop-shadow(0 0 0px rgba(0, 25, 255, 0)); }
+  50%  { stroke: #0019ff; filter: drop-shadow(0 0 4px rgba(0, 25, 255, 0.5)); }
+  58%  { stroke: #cccccc; filter: drop-shadow(0 0 0px rgba(0, 25, 255, 0)); }
+  100% { stroke: #cccccc; filter: drop-shadow(0 0 0px rgba(0, 25, 255, 0)); }
+}
+
+@keyframes wave-shift {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  50%      { transform: translateY(18px) translateX(-8px); }
 }
 
 /* Chart panel flip animation */
@@ -134,23 +281,33 @@
 
 /* SQL syntax highlighting */
 .sql-keyword {
-  color: var(--color-brand-400);
-  font-weight: 600;
+  color: var(--rt-code-01);
 }
 
 .sql-string {
-  color: oklch(0.72 0.17 145);
+  color: var(--rt-code-07);
 }
 
 .sql-number {
-  color: oklch(0.75 0.15 65);
+  color: var(--rt-code-03);
+}
+
+.sql-literal {
+  color: var(--rt-code-02);
 }
 
 .sql-comment {
-  color: oklch(0.55 0 0);
+  color: var(--rt-code-04);
   font-style: italic;
 }
 
 .sql-function {
-  color: oklch(0.75 0.12 200);
+  color: var(--rt-code-03);
 }
+
+.dark .sql-keyword { color: var(--color-brand-400); font-weight: 600; }
+.dark .sql-literal { color: oklch(0.75 0.15 65); }
+.dark .sql-string { color: oklch(0.72 0.17 145); }
+.dark .sql-number { color: oklch(0.75 0.15 65); }
+.dark .sql-comment { color: oklch(0.55 0 0); }
+.dark .sql-function { color: oklch(0.75 0.12 200); }

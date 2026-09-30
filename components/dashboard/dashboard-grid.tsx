@@ -5,6 +5,7 @@ import { ApiKeyForm } from "@/components/dashboard/api-key-form";
 import { ChartPanel } from "@/components/dashboard/chart-panel";
 import { DashboardToolbar } from "@/components/dashboard/dashboard-toolbar";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { useHeaderActions } from "@/components/layout/header-actions";
 import {
   applyDashboardFilters,
   buildDateRangeQuery,
@@ -17,10 +18,19 @@ import { runQuery, type QueryResult, type RawtreeConfig } from "@/lib/rawtree-ap
 
 type Stats = Record<string, number>;
 
+const LAYOUT = [
+  "contributor-leaderboard",
+  "quality-over-time",
+  "quality-by-repository",
+  "reviews-by-repository",
+  "review-outcomes",
+];
+const FULL_WIDTH = new Set(["quality-over-time", "review-outcomes", "contributor-leaderboard"]);
+
 function formatNumber(value: number): string {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
   if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
-  return value.toLocaleString();
+  return value.toLocaleString("en-US");
 }
 
 function formatStat(key: string, value: number): string {
@@ -122,7 +132,7 @@ export function DashboardGrid() {
     await initialize(cfg, "");
   }
 
-  function disconnect() {
+  const disconnect = useCallback(() => {
     setConfig(null);
     setRepositories([]);
     setRepository("");
@@ -132,12 +142,28 @@ export function DashboardGrid() {
     setResults({});
     setErrors({});
     setAutoRefresh(false);
-  }
+  }, []);
+
+  const { setOnDisconnect } = useHeaderActions();
+  const connected = config !== null;
+  useEffect(() => {
+    if (!connected) return;
+    setOnDisconnect(disconnect);
+    return () => setOnDisconnect(null);
+  }, [connected, disconnect, setOnDisconnect]);
 
   if (!config) return <ApiKeyForm onConnect={handleConnect} />;
 
   return (
-    <div>
+    <div className="mx-auto w-full max-w-[1280px] px-4 py-8 sm:px-6">
+      <section className="mb-6 flex max-w-3xl flex-col gap-2">
+        <p className="text-subheading uppercase text-muted-foreground">Jev + RawTree</p>
+        <h1 className="text-display-sm">Jev-Assisted Pull Request Quality</h1>
+        <p className="text-body text-muted-foreground">
+          Review complete pull request diffs with Jev, retain structured quality events in RawTree,
+          and compare contributors and repositories without counting reruns twice.
+        </p>
+      </section>
       <DashboardToolbar
         endpoint={config.endpoint}
         repositories={repositories}
@@ -153,25 +179,19 @@ export function DashboardGrid() {
         }}
         onAutoRefreshToggle={() => setAutoRefresh((value) => !value)}
         onRefresh={() => void executeQueries(config, repository, dateFrom || undefined, dateTo || undefined)}
-        onDisconnect={disconnect}
       />
 
       {stats && (
-        <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mb-4 grid grid-cols-2 gap-px overflow-hidden rounded-card border bg-border sm:grid-cols-4">
           {dashboardConfig.stats.map((stat) => (
             <StatCard key={stat.key} label={stat.label} value={formatStat(stat.key, stats[stat.key] ?? 0)} />
           ))}
         </div>
       )}
 
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-6">
-        {dashboardQueries.map((query) => (
-          <div
-            key={query.id}
-            className={query.id === "reviews-by-repository"
-              ? "md:col-span-2 lg:col-span-6"
-              : "md:col-span-2 lg:col-span-3"}
-          >
+      <div className="grid gap-4 lg:grid-cols-2">
+        {LAYOUT.map((id) => dashboardQueries.find((query) => query.id === id)!).map((query) => (
+          <div key={query.id} className={FULL_WIDTH.has(query.id) ? "lg:col-span-2" : undefined}>
             <ChartPanel
               query={query}
               result={results[query.id] ?? null}

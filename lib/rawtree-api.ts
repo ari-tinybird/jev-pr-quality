@@ -1,3 +1,5 @@
+import { isDemoKey, runDemoQuery } from "@/lib/demo-data";
+
 export interface QueryResult {
   meta: { name: string; type: string }[];
   data: Record<string, unknown>[];
@@ -12,6 +14,8 @@ export async function runQuery(
   apiKey: string,
   sql: string
 ): Promise<QueryResult> {
+  if (isDemoKey(apiKey)) return runDemoQuery(sql);
+
   const url = endpoint.replace(/\/+$/, "") + "/v1/query";
 
   const res = await fetch(url, {

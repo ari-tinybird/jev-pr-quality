@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { AppThemeProvider } from "@/components/theme-provider";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { HeaderActionsProvider } from "@/components/layout/header-actions";
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import "./globals.css";
@@ -43,9 +44,11 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <AppThemeProvider>
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
+          <HeaderActionsProvider>
+            <SiteHeader />
+            <main className="flex flex-1 flex-col">{children}</main>
+            <SiteFooter />
+          </HeaderActionsProvider>
         </AppThemeProvider>
       </body>
     </html>

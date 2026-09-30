@@ -47,6 +47,10 @@ export function buildDedupCte(): string {
 
 const CTE = buildDedupCte();
 
+function average(values: number[]): number {
+  return values.reduce((sum, value) => sum + value, 0) / (values.length || 1);
+}
+
 export const repositoryListQuery = `SELECT DISTINCT
   repository::Nullable(String) AS repository
 FROM ${dashboardConfig.table}
@@ -118,8 +122,14 @@ FROM events
 GROUP BY author
 ORDER BY quality_score DESC, pass_rate DESC, reviewed_prs DESC
 LIMIT 10`,
-    chartType: "horizontal-bar",
-    chartConfig: { xKey: "quality_score", yKeys: ["author"], colors: ["oklch(0.62 0.2 255)"] },
+    chartType: "table",
+    chartConfig: { xKey: "quality_score", yKeys: ["author"] },
+    columns: [
+      { key: "author", label: "Contributor" },
+      { key: "quality_score", label: "Score", format: "score" },
+      { key: "reviewed_prs", label: "PRs", format: "number", width: 117 },
+      { key: "pass_rate", label: "Pass rate", format: "percent" },
+    ],
     colSpan: 2,
     chartHeight: 260,
   },
@@ -139,11 +149,18 @@ ORDER BY day`,
     chartConfig: {
       xKey: "day",
       yKeys: ["average_score", "lowest_score"],
-      colors: ["oklch(0.62 0.2 255)", "oklch(0.7 0.17 40)"],
+      colors: ["var(--chart-1)", "var(--chart-3)"],
+      seriesLabels: { average_score: "Average score", lowest_score: "Lowest score" },
+    },
+    threshold: { value: 7, label: "Pass threshold" },
+    headline: (rows) => {
+      if (rows.length === 0) return null;
+      const mean = average(rows.map((row) => Number(row.average_score)));
+      return { value: mean.toFixed(1), unit: "/10" };
     },
     showLegend: true,
     colSpan: 2,
-    chartHeight: 260,
+    chartHeight: 200,
   },
   {
     id: "quality-by-repository",
@@ -159,9 +176,20 @@ GROUP BY repository
 ORDER BY quality_score DESC, reviewed_prs DESC
 LIMIT 15`,
     chartType: "horizontal-bar",
-    chartConfig: { xKey: "quality_score", yKeys: ["repository"], colors: ["oklch(0.68 0.16 150)"] },
+    chartConfig: {
+      xKey: "quality_score",
+      yKeys: ["repository"],
+      colors: ["var(--chart-1)"],
+      seriesLabels: { quality_score: "Quality score" },
+    },
+    threshold: { value: 7, label: "Pass threshold" },
+    headline: (rows) => {
+      if (rows.length === 0) return null;
+      const mean = average(rows.map((row) => Number(row.quality_score)));
+      return { value: mean.toFixed(1), unit: "/10" };
+    },
     colSpan: 2,
-    chartHeight: 260,
+    chartHeight: 110,
   },
   {
     id: "review-outcomes",
@@ -175,9 +203,25 @@ FROM events
 GROUP BY outcome
 ORDER BY reviews DESC`,
     chartType: "horizontal-bar",
-    chartConfig: { xKey: "reviews", yKeys: ["outcome"], colors: ["oklch(0.62 0.2 255)"] },
+    chartConfig: {
+      xKey: "reviews",
+      yKeys: ["outcome"],
+      colors: ["var(--chart-1)"],
+      seriesLabels: { reviews: "Reviews" },
+      categoryColors: { Passed: "var(--success)", "Below threshold": "var(--destructive)" },
+    },
+    headline: (rows) => {
+      const total = rows.reduce((sum, row) => sum + Number(row.reviews), 0);
+      const passed = Number(rows.find((row) => row.outcome === "Passed")?.reviews ?? 0);
+      if (!total) return null;
+      return {
+        value: passed.toLocaleString("en-US"),
+        unit: `/${total.toLocaleString("en-US")} passed`,
+        suffix: ` (${((100 * passed) / total).toFixed(1)}%)`,
+      };
+    },
     colSpan: 2,
-    chartHeight: 240,
+    chartHeight: 56,
   },
   {
     id: "reviews-by-repository",
@@ -192,8 +236,16 @@ GROUP BY repository
 ORDER BY reviews DESC
 LIMIT 15`,
     chartType: "bar",
-    chartConfig: { xKey: "repository", yKeys: ["reviews"], colors: ["oklch(0.7 0.17 40)"] },
+    chartConfig: {
+      xKey: "repository",
+      yKeys: ["reviews"],
+      colors: ["var(--chart-1)"],
+      seriesLabels: { reviews: "Reviews" },
+    },
+    headline: (rows) => ({
+      value: rows.reduce((sum, row) => sum + Number(row.reviews), 0).toLocaleString("en-US"),
+    }),
     colSpan: 2,
-    chartHeight: 240,
+    chartHeight: 114,
   },
 ];

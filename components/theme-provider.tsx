@@ -12,6 +12,8 @@ import {
 
 type Theme = "light" | "dark" | "system";
 
+const DARK_MODE_READY = false;
+
 type ThemeContextValue = {
   theme: Theme;
   resolvedTheme: "light" | "dark";
@@ -60,8 +62,9 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
     getSystemTheme,
     () => "light"
   );
+  // Dark mode is not designed yet: follow the system only once it is.
   const resolvedTheme: "light" | "dark" =
-    activeTheme === "system" ? systemTheme : activeTheme;
+    activeTheme === "system" ? (DARK_MODE_READY ? systemTheme : "light") : activeTheme;
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", resolvedTheme === "dark");

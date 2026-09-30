@@ -3,7 +3,7 @@ import { LINKS } from "@/lib/constants";
 export function SiteFooter() {
   return (
     <footer className="mt-auto border-t">
-      <div className="mx-auto max-w-6xl px-6 py-6 text-center text-sm text-muted-foreground">
+      <div className="mx-auto max-w-[1280px] px-4 py-6 sm:px-6 text-center text-sm text-muted-foreground">
         <p>
           Jev-assisted PR review analytics powered by{" "}
           <a

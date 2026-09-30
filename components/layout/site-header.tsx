@@ -1,13 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ExternalLink } from "lucide-react";
+import { HeaderActions } from "@/components/layout/header-actions";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { LINKS } from "@/lib/constants";
 
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-sm">
-      <div className="mx-auto flex h-14 max-w-6xl items-center px-6">
+      <div className="mx-auto flex h-14 max-w-[1280px] items-center px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5">
           <Image
             src="/rawtree-logo.svg"
@@ -43,7 +44,8 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-3">
-          <ThemeToggle />
+          <ThemeToggle className="hidden" />
+          <HeaderActions />
         </div>
       </div>
     </header>

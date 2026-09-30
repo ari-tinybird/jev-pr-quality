@@ -3,26 +3,45 @@
 [![CI](https://github.com/rawtreedb/jev-pr-quality/actions/workflows/ci.yml/badge.svg)](https://github.com/rawtreedb/jev-pr-quality/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-**Jev-Assisted Pull Request Quality, visible over time.**
+**Add Jev-assisted pull request reviews and a live quality dashboard in two
+minutes.**
 
-Jev PR Quality turns structured pull request reviews into an objective team
-signal. The GitHub Action reviews every PR, comments with actionable scores,
-and logs each result to RawTree. The self-hosted dashboard shows whether quality
-is improving across contributors, repositories, and time.
+## Get running in two minutes
 
-![Jev PR Quality dashboard showing pull request quality across repositories](docs/dashboard.png)
+### 1. Copy the workflow
 
-## Why Jev?
+Copy [`examples/jev-review.yml`](examples/jev-review.yml) into
+`.github/workflows/jev-review.yml` in your repository, or run:
 
-Most AI code review produces prose: useful in the moment, difficult to compare,
-and quickly lost in a PR timeline. Jev produces typed, repeatable ratings across
-19 software-quality dimensions. That makes the review both actionable now and
-measurable later.
+```sh
+mkdir -p .github/workflows
+curl -L https://raw.githubusercontent.com/rawtreedb/jev-pr-quality/main/examples/jev-review.yml \
+  -o .github/workflows/jev-review.yml
+```
 
-Jev reviews the complete PR diff rather than a sample. A PR fails when any
-applicable dimension falls below the threshold, so one critical weakness cannot
-hide behind a good average. Tests remain the source of truth and humans retain
-the final decision; Jev adds a consistent quality lens between them.
+### 2. Add two GitHub Actions secrets
+
+In your repository, open **Settings → Secrets and variables → Actions** and add:
+
+| Secret | Get it from | Access |
+| --- | --- | --- |
+| `JEV_API_KEY` | [TypeSafe console](https://console.typesafe.ai/keys) | Jev evaluation |
+| `RAWTREE_JEV_API_KEY` | [RawTree](https://rawtree.com) → **Settings → API keys** | Write-only |
+
+Create a RawTree database (for example, `jev_prs`) and make it the write key's
+default database. For several repositories, use organization secrets scoped to
+the repositories you want to review.
+
+### 3. See it live
+
+Create a separate RawTree **read-only** key with the **same default database** as
+the write key. Open the [live dashboard](https://jev-pr-quality.vercel.app) and
+paste it in. The key stays in browser memory and is sent directly to RawTree.
+
+[![Jev PR Quality dashboard showing pull request quality across repositories](docs/dashboard.png)](https://jev-pr-quality.vercel.app)
+
+That is it. Each new PR gets a Jev review comment and quality check, while its
+structured score is appended to RawTree and appears in the dashboard.
 
 ## How it works
 
@@ -47,66 +66,25 @@ threshold. The included dashboard keeps only the latest run for each
 - **Self-hosted frontend:** deploy with Node.js or Docker; no dashboard backend.
 - **Safe token split:** CI gets a write-only key, viewers use read-only keys.
 
-## Get the API keys
-
-You need two GitHub Actions secrets:
-
-1. Create a Jev API key in the
-   [TypeSafe console](https://console.typesafe.ai/keys) and save it as
-   `JEV_API_KEY`.
-2. Sign in to [RawTree](https://rawtree.com), open the target organization and
-   cluster, then open **Settings → API keys**. Create a dedicated **write-only**
-   key for the database that should store review events and save it as
-   `RAWTREE_JEV_API_KEY`.
-
-The dashboard needs a separate **read-only** RawTree key for that same database.
-Viewers paste it into the dashboard at runtime; it is kept only in browser memory.
-Never expose the write-only CI key to the dashboard.
-
-## Add the PR review
-
-Create `.github/workflows/jev-review.yml` in each repository:
-
-```yaml
-name: Jev Review
-
-on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review, edited]
-
-permissions:
-  contents: read
-  pull-requests: write
-
-concurrency:
-  group: jev-review-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-
-jobs:
-  review:
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
-          persist-credentials: false
-
-      - uses: rawtreedb/jev-pr-quality@main
-        with:
-          jev-api-key: ${{ secrets.JEV_API_KEY }}
-          rawtree-api-key: ${{ secrets.RAWTREE_JEV_API_KEY }}
-```
-
 `@main` is the preview channel while the project is under review. Pin the first
 stable `@v1` release when it is published.
 
-Add `JEV_API_KEY` and a dedicated RawTree **write-only**
-`RAWTREE_JEV_API_KEY` in Actions secrets. For multiple repositories, use
-organization secrets scoped to the participating repositories. Every event
-contains `github.repository`, so all repositories can safely write to the same
-destination.
+Every event contains `github.repository`, so several repositories can safely
+write to one RawTree database and appear together in the dashboard.
+
+## Why Jev?
+
+Most AI code review produces prose: useful in the moment, difficult to compare,
+and quickly lost in a PR timeline. Jev produces typed, repeatable ratings across
+19 software-quality dimensions. That makes the review both actionable now and
+measurable later.
+
+Jev reviews the complete PR diff rather than a sample. A PR fails when any
+applicable dimension falls below the threshold, so one critical weakness cannot
+hide behind a good average. Tests remain the source of truth and humans retain
+the final decision; Jev adds a consistent quality lens between them.
+
+## Configuration
 
 The defaults are the public convention and normally should not be changed:
 
@@ -120,14 +98,14 @@ The defaults are the public convention and normally should not be changed:
 Override the database, table, or endpoint only to isolate a private installation.
 Never distribute a shared write token in a public workflow or frontend.
 
-### Public dashboard, private data
+## Public dashboard, private data
 
 The frontend itself is safe to publish. It contains no credentials and has no
 server-side session or proxy. Each viewer supplies their own RawTree read-only
 key, which remains in that browser tab's memory. Data visibility is therefore
 controlled by the RawTree key—not by the deployment being public or private.
 
-## Run the dashboard
+## Self-host the dashboard
 
 Requirements: Node.js 24 and npm.
 
@@ -172,6 +150,11 @@ producing a partial, misleading review.
 Jev is an advisory review signal that complements tests and human review. Scores
 are model judgments, not proof of correctness. Historical comparisons should use
 the same rubric and model period.
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup,
+checks, and event-schema expectations.
 
 ## Development
 

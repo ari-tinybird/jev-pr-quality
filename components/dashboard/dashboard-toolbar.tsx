@@ -48,7 +48,7 @@ export function DashboardToolbar({
   function changeDate(from: string, to: string) {
     setLocalFrom(from);
     setLocalTo(to);
-    if (from && to && from <= to) onDateChange(from, to);
+    if (!from || !to || from <= to) onDateChange(from, to);
   }
 
   return (

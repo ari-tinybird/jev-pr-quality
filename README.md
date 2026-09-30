@@ -144,6 +144,14 @@ The dashboard starts with all repositories combined and provides a repository
 selector. It compares only real `jev_pr_review` events on rubric version `1`;
 unrelated records are excluded.
 
+### Vercel
+
+Import this repository as a Next.js project with the repository root as the root
+directory. The committed build command and Node.js version are sufficient; no
+Vercel environment variables are required. Do not add either API key to Vercel:
+the write-only key belongs in GitHub Actions, and viewers enter read-only keys at
+runtime.
+
 ### Docker
 
 ```sh

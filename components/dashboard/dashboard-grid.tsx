@@ -155,6 +155,7 @@ export function DashboardGrid() {
   if (!config) return <ApiKeyForm onConnect={handleConnect} />;
 
   return (
+    <div className="flex-1 bg-canvas">
     <div className="mx-auto w-full max-w-[1280px] px-4 py-8 sm:px-6">
       <section className="mb-6 flex max-w-3xl flex-col gap-2">
         <p className="text-subheading uppercase text-muted-foreground">Jev + RawTree</p>
@@ -201,6 +202,7 @@ export function DashboardGrid() {
           </div>
         ))}
       </div>
+    </div>
     </div>
   );
 }

@@ -269,6 +269,21 @@
   50%      { transform: translateY(18px) translateX(-8px); }
 }
 
+/* Table score bars grow like the chart bars (Recharts Bar default: 400ms ease) */
+@keyframes table-bar-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.table-bar-grow {
+  transform-origin: left center;
+  animation: table-bar-grow 400ms ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .table-bar-grow { animation: none; }
+}
+
 /* Chart panel flip animation */
 @keyframes chart-flip-in {
   0% { opacity: 0; transform: rotateY(90deg) scale(0.95); }

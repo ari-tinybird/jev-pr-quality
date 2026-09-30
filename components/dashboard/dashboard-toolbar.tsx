@@ -18,7 +18,6 @@ interface DashboardToolbarProps {
 
 const PILL_BASE = "flex h-9 shrink-0 items-center gap-2.5 rounded-full border bg-card px-4 text-body font-semibold transition-colors";
 const FIELD = `${PILL_BASE} hover:border-primary active:border-brand-dark`;
-const BUTTON = `${PILL_BASE} hover:border-primary active:border-primary active:bg-primary active:text-primary-foreground`;
 
 export function DashboardToolbar({
   endpoint,
@@ -46,8 +45,14 @@ export function DashboardToolbar({
     setLocalTo(dateTo);
   }
 
+  function changeDate(from: string, to: string) {
+    setLocalFrom(from);
+    setLocalTo(to);
+    if (from && to && from <= to) onDateChange(from, to);
+  }
+
   return (
-    <div className="mb-4 flex flex-wrap items-center gap-2 rounded-panel border bg-surface-01 p-2 xl:flex-nowrap">
+    <div className="mb-4 flex flex-wrap items-center gap-2 rounded-panel border bg-[#eeeff4] p-2 xl:flex-nowrap">
       <span className="min-w-0 flex-1 truncate pl-3 font-mono text-code text-muted-foreground">{endpoint}</span>
       <div className="ml-auto flex shrink-0 flex-wrap items-center gap-2 xl:flex-nowrap">
         <label className={`${FIELD} relative cursor-pointer pr-3`}>
@@ -67,7 +72,7 @@ export function DashboardToolbar({
           id="date-from"
           type="date"
           value={localFrom}
-          onChange={(event) => setLocalFrom(event.target.value)}
+          onChange={(event) => changeDate(event.target.value, localTo)}
           className={`${FIELD} outline-none`}
         />
         <label className="text-body text-muted-foreground" htmlFor="date-to">To</label>
@@ -75,12 +80,9 @@ export function DashboardToolbar({
           id="date-to"
           type="date"
           value={localTo}
-          onChange={(event) => setLocalTo(event.target.value)}
+          onChange={(event) => changeDate(localFrom, event.target.value)}
           className={`${FIELD} outline-none`}
         />
-        <button type="button" onClick={() => onDateChange(localFrom, localTo)} className={BUTTON}>
-          Apply
-        </button>
         <label className="group flex cursor-pointer items-center gap-2 px-2 text-body">
           <input type="checkbox" checked={autoRefresh} onChange={onAutoRefreshToggle} className="peer sr-only" />
           <span

@@ -179,7 +179,7 @@ function DataTable({ query, data }: { query: DashboardQuery; data: Record<string
                       <span className="flex items-center justify-end gap-4">
                         <span className="h-1.5 w-[200px] min-w-24 overflow-hidden rounded-[4px] bg-surface-01">
                           <span
-                            className="block h-full bg-primary"
+                            className="table-bar-grow block h-full bg-primary"
                             style={{ width: `${Math.min(100, Number(row[column.key]) * 10)}%` }}
                           />
                         </span>

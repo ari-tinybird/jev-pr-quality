@@ -66,7 +66,7 @@ test('inserts the event with a write-only key and optional database selector', a
   assert.deepEqual(JSON.parse(request.options.body), [event]);
 });
 
-test('inserts demo events as one batch', async () => {
+test('inserts multiple review events as one batch', async () => {
   const events = [{ event_id: 'one' }, { event_id: 'two' }];
   let body;
   await insertReviewEvents({

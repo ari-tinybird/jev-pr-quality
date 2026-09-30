@@ -26,4 +26,6 @@ jobs:
       - uses: rawtreedb/jev-pr-quality@main
         with:
           jev-api-key: ${{ secrets.JEV_API_KEY }}
+          minimum-score: ${{ vars.JEV_MIN_SCORE || '7' }}
           rawtree-api-key: ${{ secrets.RAWTREE_JEV_API_KEY }}
+          rawtree-database: ${{ vars.RAWTREE_JEV_DATABASE }}

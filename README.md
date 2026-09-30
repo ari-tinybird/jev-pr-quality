@@ -46,7 +46,22 @@ threshold. The included dashboard keeps only the latest run for each
 - **Multi-repository by default:** compare an organization or focus on one repo.
 - **Self-hosted frontend:** deploy with Node.js or Docker; no dashboard backend.
 - **Safe token split:** CI gets a write-only key, viewers use read-only keys.
-- **Resumable history:** backfill retained GitHub Actions review artifacts.
+
+## Get the API keys
+
+You need two GitHub Actions secrets:
+
+1. Create a Jev API key in the
+   [TypeSafe console](https://console.typesafe.ai/keys) and save it as
+   `JEV_API_KEY`.
+2. Sign in to [RawTree](https://rawtree.com), open the target organization and
+   cluster, then open **Settings → API keys**. Create a dedicated **write-only**
+   key for the database that should store review events and save it as
+   `RAWTREE_JEV_API_KEY`.
+
+The dashboard needs a separate **read-only** RawTree key for that same database.
+Viewers paste it into the dashboard at runtime; it is kept only in browser memory.
+Never expose the write-only CI key to the dashboard.
 
 ## Add the PR review
 
@@ -127,7 +142,15 @@ It is never persisted or sent to the dashboard server.
 
 The dashboard starts with all repositories combined and provides a repository
 selector. It compares only real `jev_pr_review` events on rubric version `1`;
-synthetic demo rows and unrelated records are excluded.
+unrelated records are excluded.
+
+### Vercel
+
+Import this repository as a Next.js project with the repository root as the root
+directory. The committed build command and Node.js version are sufficient; no
+Vercel environment variables are required. Do not add either API key to Vercel:
+the write-only key belongs in GitHub Actions, and viewers enter read-only keys at
+runtime.
 
 ### Docker
 
@@ -138,26 +161,6 @@ docker run --rm -p 3000:3000 jev-pr-quality
 
 The image runs as an unprivileged user and contains no credentials. Put TLS in
 front of it before asking users to enter read keys.
-
-## Backfill retained reviews
-
-The backfill reads retained `jev-review-*` GitHub Actions artifacts. It caches
-downloads and checkpoints inserted event IDs, so interrupted runs are resumable.
-
-```sh
-export JEV_BACKFILL_REPOSITORY=owner/repository
-export RAWTREE_JEV_API_KEY
-
-# Inspect a small sample, then write it.
-node scripts/jev-review/backfill-rawtree.mjs --limit=3
-node scripts/jev-review/backfill-rawtree.mjs --limit=3 --write
-
-# Later, fill the remaining retained history.
-node scripts/jev-review/backfill-rawtree.mjs --write
-```
-
-Run the command once per repository. All repositories may target the default
-table; repository identity is part of both the event ID and dashboard dedup key.
 
 ## What Jev receives
 
